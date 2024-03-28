@@ -139,7 +139,7 @@ async function post_register(req: Request, res: Response, next: NextFunction) {
   });
 
   if (result.isErr())
-    return res.status(500).json({ error: 'Internal error' });
+    return res.status(500).json({ error: Errors.INTERNAL });
 
   if (!req.resources)
     req.resources = {};
