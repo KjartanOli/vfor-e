@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
-import { matchedData } from 'express-validator';
+import { matchedData, param } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { Endpoint, Method, MethodDescriptor, User, default_method_descriptor } from '../lib/types.js';
 import { jwt_secret, token_lifetime } from '../app.js';
@@ -10,6 +10,12 @@ import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, p
 import { admin_authenticator, ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
 import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
 import { check_validation } from '../lib/validators/validators.js';
+import { get_models, post_models } from './models.js';
+import { new_model_validator } from '../lib/validators/models.js';
+import { get_rank, get_ranks, patch_rank, post_ranks } from './ranks.js';
+import { existing_rank_id_validator, new_rank_validator, rank_name_validator } from '../lib/validators/ranks.js';
+import { get_battle, get_battles, patch_battle, post_battles } from './battles.js';
+import { existing_battle_id_validator, new_battle_validator, update_battle_validator } from '../lib/validators/battles.js';
 
 export const router = express.Router();
 
@@ -46,6 +52,80 @@ const endpoints: Array<Endpoint> = [
     ]
   },
   {
+    href: '/ranks',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        handlers: [get_ranks]
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.POST,
+        authentication: [ensure_authenticated],
+        validation: [...new_rank_validator],
+        handlers: [post_ranks]
+      }
+    ]
+  },
+  {
+    href: '/ranks/:id',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_rank_id_validator()],
+        handlers: [get_rank],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.PATCH,
+        authentication: [ensure_authenticated],
+        validation: [existing_rank_id_validator(), rank_name_validator()],
+        handlers: [patch_rank],
+      }
+    ]
+  },
+  {
+    href: '/battles',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        handlers: [get_battles],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.POST,
+        authentication: [ensure_authenticated],
+        validation: [...new_battle_validator],
+        handlers: [post_battles],
+      },
+    ]
+  },
+  {
+    href: '/battles/:id',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_battle_id_validator()],
+        handlers: [get_battle],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.PATCH,
+        authentication: [ensure_authenticated],
+        validation: [existing_battle_id_validator(), ...update_battle_validator],
+        handlers: [patch_battle],
+      }
+    ]
+  },
+  {
     href: '/units',
     methods: [
       {
@@ -53,6 +133,24 @@ const endpoints: Array<Endpoint> = [
         method: Method.GET,
         authentication: [ensure_authenticated],
         handlers: [get_units]
+      }
+    ],
+  },
+  {
+    href: '/models',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        handlers: [get_models]
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.POST,
+        authentication: [ensure_authenticated],
+        validation: [...new_model_validator],
+        handlers: [post_models]
       }
     ],
   },

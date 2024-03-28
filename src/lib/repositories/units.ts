@@ -1,23 +1,42 @@
-import { User, Unit, Model } from '../types';
+import { User, Unit, Model, BattleHonour, Award } from '../types';
 import { db } from '../../app.js';
 import { Err, Ok, Result } from 'ts-results-es';
 import { Errors } from '../errors.js';
 import * as Models from './models.js';
+import * as Honours from './honours.js';
+import * as Battles from './battles.js';
 
 export async function get_units(user: User): Promise<Result<Unit[], string>> {
   try {
-    let units = await db<{ id: number, leader_id: number, name: string }[]>`
+    const results = await db<{ id: number, leader_id: number, name: string }[]>`
 SELECT id, leader as leader_id, name
-FROM units
+FROM e.units
 WHERE user_id = ${user.id}`;
-    if (!units)
+    if (!results)
       return Err(Errors.DATABASE);
 
-    await Promise.all(units.map(async unit => {
+    const units = await Promise.all(results.map(async (unit): Promise<Unit> => {
       const models = await get_models(unit.id);
+      if (models.isErr())
+        throw new Error(Errors.DATABASE);
+      const leader = models.value.find(model => model.id === unit.leader_id);
+      if (!leader)
+        throw new Error(Errors.INTERNAL);
+
+      const honours = await get_honours(unit.id, user);
+      if (honours.isErr())
+        throw new Error(Errors.INTERNAL);
+
+      return {
+        id: unit.id,
+        name: unit.name,
+        members: models.value,
+        leader,
+        honours: honours.value
+      };
     }));
 
-    return Err('not implemented');
+    return Ok(units);
 
   } catch (e) {
     console.log(e);
@@ -44,3 +63,34 @@ WHERE m.id = ${id}`;
     return Err(Errors.DATABASE);
   }
 }
+async function get_honours(id: number, user: User): Promise<Result<Award[], string>> {
+  try {
+    const honours = await db<{honour_id: number, battle_id: number, reason: string}[]>`
+SELECT honour as honour_id, battle as battle_id, reason
+FROM e.unit_battle_honours
+WHERE unit = ${id}`;
+
+    if (!honours)
+      return Err(Errors.DATABASE);
+
+    return Ok(await Promise.all(honours.map(async (h): Promise<Award> => {
+      const honour = await Honours.find_by_id(h.honour_id);
+      if (honour.isErr() || honour.value.isNone())
+        throw new Error(Errors.DATABASE);
+
+      const battle = await Battles.find_by_id(user)(h.battle_id);
+      if (battle.isErr() || battle.value.isNone())
+        throw new Error(Errors.DATABASE);
+
+      return {
+        honour: honour.value.value,
+        battle: battle.value.value,
+        reason: h.reason
+      };
+    })));
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+

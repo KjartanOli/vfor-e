@@ -7,13 +7,17 @@ CREATE TABLE e.users(
 
 CREATE TABLE e.ranks(
        id SERIAL PRIMARY KEY,
+       user_id INTEGER REFERENCES e.users(id),
        name VARCHAR(64) UNIQUE
 );
 
 CREATE TABLE e.battles(
        id SERIAL PRIMARY KEY,
+       user_id INTEGER REFERENCES e.users(id),
        name VARCHAR(64),
-       location VARCHAR(64)
+       location VARCHAR(64),
+       date DATE,
+       description TEXT
 );
 
 CREATE TABLE e.factions(
@@ -40,7 +44,7 @@ CREATE TABLE e.wargear(
 
 CREATE TABLE e.models(
        id SERIAL PRIMARY KEY,
-       user INTEGER REFERENCES e.users(id),
+       user_id INTEGER REFERENCES e.users(id),
        name VARCHAR(64),
        rank INTEGER REFERENCES e.ranks(id)
 );
@@ -61,7 +65,7 @@ CREATE TABLE e.model_battle_honours(
 
 CREATE TABLE e.units(
        id SERIAL PRIMARY KEY,
-       user INTEGER REFERENCES e.users(id),
+       user_id INTEGER REFERENCES e.users(id),
        name VARCHAR(64),
        leader INTEGER REFERENCES e.models(id)
 );

@@ -18,19 +18,37 @@ export interface Wargear {
   type: WargearType
 };
 
+export interface Battle {
+  id: number,
+  name: string,
+  location: string,
+  date: Date,
+  description: string | null
+};
+
 export interface BattleHonour {
   id: number,
   name: string,
+  description: string,
+};
+
+export interface Award {
+  honour: BattleHonour,
+  battle: Battle,
   reason: string,
-  awarded: Date
+};
+
+export interface Rank {
+  id: number,
+  name: string,
 };
 
 export interface Model {
   id: number,
   name: string,
-  rank: string,
+  rank: Rank,
   wargear: Wargear[],
-  honours: BattleHonour[]
+  honours: Award[]
 };
 
 export interface Unit {
@@ -38,7 +56,7 @@ export interface Unit {
   name: string,
   leader: Model,
   members: Model[],
-  honours: BattleHonour[]
+  honours: Award[]
 };
 
 export enum Method {
@@ -81,7 +99,12 @@ declare global {
       admin: boolean,
     }
     export interface Request {
-      resources: { user?: User, type?: WargearType }
+      resources: {
+        user?: User,
+        type?: WargearType,
+        rank?: Rank,
+        battle?: Battle,
+      }
     }
   }
 }

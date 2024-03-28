@@ -33,5 +33,12 @@ def login(username, password):
     return post('login', {'username': username, 'password': password})['token']
 
 
+def register(username, password):
+    return post('register', {'username': username, 'password': password})['token']
+
+
 def create_wargear(name, type_id, token):
-    return post('wargear', { 'name': name, 'type': type_id }, token)
+    return post('wargear', {
+        'name': name,
+        'type': type_id
+    }, token)
