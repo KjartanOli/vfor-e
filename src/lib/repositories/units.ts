@@ -1,7 +1,7 @@
-import { User, Unit, Model } from './types';
-import { db } from '../app.js';
+import { User, Unit, Model } from '../types';
+import { db } from '../../app.js';
 import { Err, Ok, Result } from 'ts-results-es';
-import { Errors } from './errors.js';
+import { Errors } from '../errors.js';
 import * as Models from './models.js';
 
 export async function get_units(user: User): Promise<Result<Unit[], string>> {

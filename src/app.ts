@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { router } from './routes/api.js';
-import * as users from './lib/users.js';
+import * as users from './lib/repositories/users.js';
 import postgres from 'postgres';
 
 const {

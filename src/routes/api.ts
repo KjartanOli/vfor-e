@@ -3,7 +3,7 @@ import { matchedData } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { Endpoint, Method, MethodDescriptor, User, default_method_descriptor } from '../lib/types.js';
 import { jwt_secret, token_lifetime } from '../app.js';
-import * as Users from '../lib/users.js';
+import * as Users from '../lib/repositories/users.js';
 import { Errors } from '../lib/errors.js';
 import { get_units } from './units.js';
 import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, post_wargear, post_wargear_types } from './wargear.js';

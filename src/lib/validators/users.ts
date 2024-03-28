@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { resource_exists, string_validator } from "./validators.js";
 import { User } from "../types";
-import * as Users from '../users.js';
+import * as Users from '../repositories/users.js';
 import passport from "passport";
 import { Request, Response, NextFunction } from "express";
 

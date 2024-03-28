@@ -1,9 +1,9 @@
 import { Option, Some, None, Result, Err, Ok } from 'ts-results-es';
 import { Argon2id } from 'oslo/password';
-import { User } from './types.js';
-import { db } from '../app.js';
+import { User } from '../types.js';
+import { db } from '../../app.js';
 import { PostgresError } from 'postgres';
-import { Errors } from './errors.js';
+import { Errors } from '../errors.js';
 
 const argon = new Argon2id();
 

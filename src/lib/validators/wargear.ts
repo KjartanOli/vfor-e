@@ -1,7 +1,7 @@
 import { body, param } from "express-validator";
 import { Wargear, WargearType } from "../types";
 import { int_validator, resource_exists, string_validator } from "./validators.js";
-import * as W from '../wargear.js';
+import * as W from '../repositories/wargear.js';
 
 export function wargear_type_name_validator() {
   return string_validator(body, 'name', 1, 20)

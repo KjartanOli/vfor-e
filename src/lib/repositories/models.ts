@@ -1,5 +1,5 @@
-import { db } from '../app.js';
-import { BattleHonour, Wargear } from './types';
+import { db } from '../../app.js';
+import { BattleHonour, Wargear } from '../types';
 
 export async function get_wargear(id: number): Promise<Wargear[]> {
   return db<Wargear[]>`

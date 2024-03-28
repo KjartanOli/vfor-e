@@ -1,7 +1,7 @@
 import { Err, Ok, Result, Option, Some, None } from 'ts-results-es';
-import { db } from '../app.js';
-import { Wargear, WargearType } from './types.js';
-import { Errors } from './errors.js';
+import { db } from '../../app.js';
+import { Wargear, WargearType } from '../types.js';
+import { Errors } from '../errors.js';
 
 export async function get_wargear(): Promise<Result<Wargear[], string>> {
   try {

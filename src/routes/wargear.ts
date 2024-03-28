@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import * as Wargear from '../lib/wargear.js';
+import * as Wargear from '../lib/repositories/wargear.js';
 import { Errors } from "../lib/errors.js";
 import { matchedData } from "express-validator";
 
