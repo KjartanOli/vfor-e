@@ -18,7 +18,6 @@ export const new_user_validator = [
   string_validator(body, 'password', 1)
 ];
 
-
 export async function ensure_authenticated(req: Request, res: Response, next: NextFunction) {
   return passport.authenticate(
     'jwt',
@@ -38,9 +37,14 @@ export async function ensure_authenticated(req: Request, res: Response, next: Ne
     })(req, res, next);
 }
 
-export async function ensure_admin(req: Request, res: Response, next: NextFunction) {
+async function ensure_admin(req: Request, res: Response, next: NextFunction) {
   if (!req.user?.admin)
     return res.status(401).json({ error: 'Insufficient permissions' });
 
   next();
 }
+
+export const admin_authenticator = [
+  ensure_authenticated,
+  ensure_admin,
+];

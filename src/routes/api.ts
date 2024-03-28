@@ -7,7 +7,7 @@ import * as Users from '../lib/users.js';
 import { Errors } from '../lib/errors.js';
 import { get_units } from './units.js';
 import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, post_wargear, post_wargear_types } from './wargear.js';
-import { ensure_admin, ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
+import { admin_authenticator, ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
 import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
 import { check_validation } from '../lib/validators/validators.js';
 
@@ -67,7 +67,7 @@ const endpoints: Array<Endpoint> = [
       {
         ...default_method_descriptor,
         method: Method.POST,
-        authentication: [ensure_authenticated, ensure_admin],
+        authentication: [...admin_authenticator],
         validation: [...new_wargear_validator],
         handlers: [post_wargear]
       },
@@ -84,7 +84,7 @@ const endpoints: Array<Endpoint> = [
       {
         ...default_method_descriptor,
         method: Method.POST,
-        authentication: [ensure_authenticated, ensure_admin],
+        authentication: [...admin_authenticator],
         validation: [...new_wargear_type_validator],
         handlers: [post_wargear_types]
       },
@@ -102,7 +102,7 @@ const endpoints: Array<Endpoint> = [
       {
         ...default_method_descriptor,
         method: Method.PATCH,
-        authentication: [ensure_authenticated, ensure_admin],
+        authentication: [...admin_authenticator],
         validation: [existing_wargear_type_id_validator(), wargear_type_name_validator()],
         handlers: [patch_wargear_type]
       }
