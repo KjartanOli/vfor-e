@@ -3,11 +3,13 @@ import { matchedData } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { Endpoint, Method, MethodDescriptor, User, default_method_descriptor } from '../lib/types.js';
 import { jwt_secret, token_lifetime } from '../app.js';
-import { check_validation, ensure_authenticated, ensure_admin, existing_user_validator, new_user_validator, new_wargear_validator, new_wargear_type_validator, existing_wargear_type_id_validator, wargear_type_name_validator } from '../lib/validators.js';
 import * as Users from '../lib/users.js';
 import { Errors } from '../lib/errors.js';
 import { get_units } from './units.js';
 import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, post_wargear, post_wargear_types } from './wargear.js';
+import { ensure_admin, ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
+import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
+import { check_validation } from '../lib/validators/validators.js';
 
 export const router = express.Router();
 
