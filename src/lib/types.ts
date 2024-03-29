@@ -104,6 +104,8 @@ declare global {
         type?: WargearType,
         rank?: Rank,
         battle?: Battle,
+        members?: Model[],
+        leader?: Model,
       }
     }
   }

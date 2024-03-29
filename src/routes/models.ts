@@ -24,6 +24,9 @@ export async function post_models(req: Request, res: Response) {
   if (!rank)
     return res.status(500).json({ error: Errors.INTERNAL });
 
-  Models.add_model({name, rank, wargear, honours}, user);
+  const model = await Models.add_model({name, rank, wargear, honours}, user);
 
+  if (model.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+  res.json(model.value);
 }

@@ -38,8 +38,9 @@ WHERE m.user_id = ${user.id}`;
   }
 }
 
-export async function get_model(id: number, user: User): Promise<Result<Option<Model>, string>> {
-  try {
+export function find_by_id(user: User): (id: number) => Promise<Result<Option<Model>, string>> {
+  return async (id: number): Promise<Result<Option<Model>, string>> => {
+    try {
     const [skel] = await db<[ModelSkeleton?]>`
 SELECT id, rank as rank_id, name
 FROM e.models
@@ -53,6 +54,7 @@ WHERE id = ${id} AND user_id = ${user.id}`;
     console.log(e);
     return Err(Errors.DATABASE);
   }
+}
 }
 
 export async function add_model(model: Omit<Model, 'id'>, user: User): Promise<Result<Model, string>> {
@@ -87,7 +89,7 @@ VALUES ${ db(model.honours.map(h => ({
         return Err(Errors.DATABASE);
 
     }
-    return Ok((await get_model(result.id, user)).unwrap().unwrap());
+    return Ok((await find_by_id(user)(result.id)).unwrap().unwrap());
   } catch (e) {
     console.log(e);
     return Err(Errors.DATABASE);

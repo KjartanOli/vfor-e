@@ -44,6 +44,45 @@ WHERE user_id = ${user.id}`;
   }
 }
 
+export async function add_unit(unit: Omit<Unit, 'id'>): Promise<Result<Unit, string>> {
+  try {
+    const [res] = await db<[{id: number}?]>`
+INSERT INTO e.units(name, leader)
+VALUES (${unit.name}, ${unit.leader.id})
+RETURNING id;`;
+
+    if (!res)
+      return Err(Errors.DATABASE);
+
+    if (!await db`
+INSERT INTO e.unit_models
+${ db(unit.members.map(m => ({
+   unit: res.id,
+   model: m.id
+ })))}`)
+      return Err(Errors.DATABASE);
+
+    if (unit.honours.length > 0)
+      if (!await db`
+INSERT INTO e.unit_battle_honours
+${ db(unit.honours.map(h => ({
+  unit: res.id,
+  honour: h.honour.id,
+  battle: h.battle.id,
+  reason: h.reason
+})), 'unit', 'honour', 'battle', 'reason')}`)
+        return Err(Errors.DATABASE);
+
+    return Ok({
+      id: res.id,
+      ...unit
+    });
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 async function get_models(id: number): Promise<Result<Model[], string>> {
   try {
     const models = await db<Omit<Model, 'wargear'>[]>`
