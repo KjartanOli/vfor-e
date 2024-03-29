@@ -56,3 +56,16 @@ export async function get_battle(req: Request, res: Response) {
 
   res.json(battle);
 }
+
+export async function delete_battle(req: Request, res: Response) {
+  const { battle } = req.resources;
+
+  if (!battle)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Battles.delete_battle(battle);
+  if (result.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  return res.status(204).json();
+}

@@ -19,6 +19,21 @@ export function existing_battle_id_validator() {
     .bail().custom(battle_id_check).withMessage('Invalid battle id')
 }
 
+export function delete_battle_validator() {
+  return int_validator(param, 'id', 1)
+    .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+      const { units, models } = await Battles.honours_for(value);
+
+      if (units.length > 0)
+        Promise.reject(`Can not delete battle while units ${units} have battle honours from it`);
+
+      if (models.length > 0)
+        Promise.reject(`Can not delete battle while models ${models} have battle honours from it`);
+
+      return Promise.resolve();
+    })
+}
+
 function battle_location_validator() {
   return string_validator(body, 'location', 1, 64);
 }

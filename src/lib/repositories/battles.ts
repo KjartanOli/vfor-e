@@ -19,6 +19,20 @@ WHERE user_id = ${user.id}`;
   }
 }
 
+export async function honours_for(id: number): Promise<{units: number[], models: number[]}> {
+  const units = (await db<{id: number}[]>`
+SELECT unit as id
+FROM e.unit_battle_honours
+WHERE battle = ${id}`).map(u => u.id);
+
+    const models = (await db<{id: number}[]>`
+SELECT model as id
+FROM e.model_battle_honours
+WHERE battle = ${id}`).map(m => m.id);
+
+  return { units, models };
+}
+
 export async function add_battle(battle: Omit<Battle, 'id'>, user: User): Promise<Result<Battle, string>> {
   try {
     const [new_battle] = await db<[Battle?]>`
@@ -29,6 +43,21 @@ RETURNING id, name, location, date`;
       return Err(Errors.DATABASE);
 
     return Ok(new_battle);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
+export async function delete_battle(battle: Battle): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE FROM e.battles
+WHERE id = ${battle.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
   } catch (e) {
     console.log(e);
     return Err(Errors.DATABASE);
