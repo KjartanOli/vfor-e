@@ -22,7 +22,7 @@ export function model_id_validator(
    return resource_exists<number, Model>('model')(Models.find_by_id(req.user))(value, { req, location, path });
  }
 
-function wargear_validator() {
+export function model_wargear_validator() {
   return body('wargear')
     .isArray()
     .bail()
@@ -75,7 +75,7 @@ export const new_model_validator = [
   string_validator(body, 'name', 1),
   int_validator(body, 'rank', 1)
     .custom(rank_id_check),
-  wargear_validator(),
+  model_wargear_validator(),
   honours_validator(),
 ];
 

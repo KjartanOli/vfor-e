@@ -49,3 +49,16 @@ export async function get_model_wargear(req: Request, res: Response) {
   res.json(model.wargear);
 }
 
+export async function post_model_wargear(req: Request, res: Response) {
+  const { model, wargear } = req.resources;
+
+  if (!model || !wargear || !req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const updated = await Models.add_wargear(model, wargear, req.user);
+
+  if (updated.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(updated.value);
+}
