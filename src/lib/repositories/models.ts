@@ -121,6 +121,9 @@ INSERT INTO e.model_wargear ${ db(wargear.map(w => (
 
 export async function remove_wargear(model: Model, wargear: Wargear): Promise<Result<null, string>> {
   try {
+    // In case of duplicate wargear items we don't actually care which
+    // one gets removed, from the users perspective they are
+    // identical, so as long as we only remove one everything is fine.
     const result = await db`
 DELETE FROM e.model_wargear
 WHERE id IN
