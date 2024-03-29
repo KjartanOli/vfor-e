@@ -4,7 +4,7 @@ url = 'http://localhost:3000'
 
 
 def get(path, token=None):
-    res =  requests.get(
+    res = requests.get(
         f'{url}/{path}',
         headers = {} if not token else {
             'Authorization': f'Bearer {token}'
