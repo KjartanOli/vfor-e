@@ -8,6 +8,7 @@ import * as Battles from '../repositories/battles.js';
 import * as Honours from '../repositories/honours.js';
 import { Award, Model, Wargear } from "../types.js";
 import { Result, Option } from 'ts-results-es';
+import { Errors } from '../errors.js';
 
 export function model_id_validator(
   value: number,
@@ -37,6 +38,20 @@ export function model_wargear_validator() {
       if (wargear.value.find(w => w.isNone()))
         return Promise.reject();
       req.resources.wargear = wargear.value.map(w => w.unwrap());
+    })
+}
+
+export function model_wargear_index_validator() {
+  return int_validator(param, 'index', 0)
+    .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+      const wargear = req.resources?.model?.wargear;
+      if (!wargear)
+        return Promise.reject(Errors.INTERNAL)
+      if (wargear.length < value)
+        return Promise.reject(`index must be between 0 and ${wargear.length}`);
+
+      req.resources.index = value;
+      return Promise.resolve();
     })
 }
 

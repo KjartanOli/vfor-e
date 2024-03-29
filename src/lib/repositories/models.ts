@@ -119,6 +119,26 @@ INSERT INTO e.model_wargear ${ db(wargear.map(w => (
   }
 }
 
+export async function remove_wargear(model: Model, wargear: Wargear): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE FROM e.model_wargear
+WHERE id IN
+(SELECT
+  id
+ FROM e.model_wargear
+ WHERE model = ${model.id} AND wargear = ${wargear.id}
+ LIMIT 1)`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 export async function add_honours(model: Model, honours: Award[], user: User): Promise<Result<Model, string>> {
   try {
     const result = await db`

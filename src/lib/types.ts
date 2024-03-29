@@ -110,6 +110,7 @@ declare global {
         leader?: Model,
         wargear?: Wargear[],
         honours?: Award[],
+        index?: number,
       }
     }
   }

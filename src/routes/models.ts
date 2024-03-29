@@ -49,6 +49,28 @@ export async function get_model_wargear(req: Request, res: Response) {
   res.json(model.wargear);
 }
 
+export async function get_model_indexed_wargear(req: Request, res: Response) {
+  const { model, index } = req.resources;
+
+  if (!model || !index)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(model.wargear[index]);
+}
+
+export async function delete_model_wargear(req: Request, res: Response) {
+  const { model, index } = req.resources;
+
+  if (!model || !index)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Models.remove_wargear(model, model.wargear[index]);
+  if (result.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  return res.status(204).json();
+}
+
 export async function get_model_honours(req: Request, res: Response) {
   const { model } = req.resources;
 

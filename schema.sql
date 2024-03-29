@@ -52,9 +52,9 @@ CREATE TABLE e.models(
 );
 
 CREATE TABLE e.model_wargear(
+       id SERIAL PRIMARY KEY,
        model INTEGER REFERENCES e.models(id),
-       wargear INTEGER REFERENCES e.wargear(id),
-       PRIMARY KEY (model, wargear)
+       wargear INTEGER REFERENCES e.wargear(id)
 );
 
 CREATE TABLE e.model_battle_honours(
