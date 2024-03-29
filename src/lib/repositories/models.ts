@@ -119,6 +119,26 @@ INSERT INTO e.model_wargear ${ db(wargear.map(w => (
   }
 }
 
+export async function add_honours(model: Model, honours: Award[], user: User): Promise<Result<Model, string>> {
+  try {
+    const result = await db`
+INSERT INTO e.model_battle_honours
+${ db(honours.map(h => ({
+  model: model.id,
+  honour: h.honour.id,
+  battle: h.battle.id,
+  reason: h.reason
+})))}`;
+    if (!result)
+      return Err(Errors.DATABASE);
+
+    return Ok((await find_by_id(user)(model.id)).unwrap().unwrap());
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 
 export async function get_wargear(id: number): Promise<Wargear[]> {
   return (await db<{id: number, name: string, type_id: number, type: string}[]>`

@@ -40,7 +40,7 @@ export function model_wargear_validator() {
     })
 }
 
-function honours_validator() {
+export function model_honours_validator() {
   return body('honours')
     .isArray()
     .bail()
@@ -76,7 +76,7 @@ export const new_model_validator = [
   int_validator(body, 'rank', 1)
     .custom(rank_id_check),
   model_wargear_validator(),
-  honours_validator(),
+  model_honours_validator(),
 ];
 
 export function existing_model_id_validator() {

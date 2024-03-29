@@ -49,6 +49,15 @@ export async function get_model_wargear(req: Request, res: Response) {
   res.json(model.wargear);
 }
 
+export async function get_model_honours(req: Request, res: Response) {
+  const { model } = req.resources;
+
+  if (!model)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(model.honours);
+}
+
 export async function post_model_wargear(req: Request, res: Response) {
   const { model, wargear } = req.resources;
 
@@ -56,6 +65,20 @@ export async function post_model_wargear(req: Request, res: Response) {
     return res.status(500).json({ error: Errors.INTERNAL });
 
   const updated = await Models.add_wargear(model, wargear, req.user);
+
+  if (updated.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(updated.value);
+}
+
+export async function post_model_honours(req: Request, res: Response) {
+  const { model, honours } = req.resources;
+
+  if (!model || !honours || !req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const updated = await Models.add_honours(model, honours, req.user);
 
   if (updated.isErr())
     return res.status(500).json({ error: Errors.INTERNAL });
