@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { int_validator, resource_exists, string_validator } from "./validators.js";
 import { rank_id_check } from "./ranks.js";
 import * as Models from '../repositories/models.js';
@@ -78,3 +78,10 @@ export const new_model_validator = [
   wargear_validator(),
   honours_validator(),
 ];
+
+export function existing_model_id_validator() {
+  return int_validator(param, 'id', 1)
+    .bail()
+    .custom(model_id_validator)
+    .withMessage('Invalid rank id');
+}

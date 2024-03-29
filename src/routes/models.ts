@@ -30,3 +30,12 @@ export async function post_models(req: Request, res: Response) {
     return res.status(500).json({ error: Errors.INTERNAL });
   res.json(model.value);
 }
+
+export async function get_model(req: Request, res: Response) {
+  const { model } = req.resources;
+
+  if (!model)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(model);
+}

@@ -105,6 +105,7 @@ declare global {
         rank?: Rank,
         honour?: BattleHonour,
         battle?: Battle,
+        model?: Model,
         members?: Model[],
         leader?: Model,
         wargear?: Wargear[],
