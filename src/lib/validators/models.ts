@@ -121,5 +121,5 @@ export function existing_model_id_validator() {
   return int_validator(param, 'id', 1)
     .bail()
     .custom(model_id_validator)
-    .withMessage('Invalid rank id');
+    .withMessage('Invalid model id');
 }
