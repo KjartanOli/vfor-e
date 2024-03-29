@@ -71,8 +71,11 @@ RETURNING id`;
 
     if (model.wargear.length > 0) {
       const wargear = await db`
-INSERT INTO e.model_wargear(model, wargear)
-VALUES (${ db(model.wargear.map(w => ({ model: result, wargear: w.id })), 'model', 'wargear')})`;
+INSERT INTO e.model_wargear ${ db(model.wargear.map(w => (
+  {
+    model: result.id,
+    wargear: w.id
+  })), 'model', 'wargear')}`;
 
       if (!wargear)
         return Err(Errors.DATABASE);
