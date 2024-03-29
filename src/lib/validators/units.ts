@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
+import { Request } from 'express';
 import { int_validator, string_validator } from './validators.js';
-import { leader_id_validator, model_id_validator } from './models.js'
 import { Result, Option } from 'ts-results-es';
 import * as Models from '../repositories/models.js';
 import { Model } from '../types.js';
@@ -31,6 +31,15 @@ function member_validator() {
 }
 export const new_unit_validator = [
   name_validator(),
-  int_validator(body, 'leader', 1).bail().custom(leader_id_validator),
   member_validator(),
+  int_validator(body, 'leader', 1).bail().custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+    if (!req.resources?.members)
+      return Promise.reject();
+
+    const leader = req.resources.members.find(m => m.id == value);
+    if (!leader)
+      return Promise.reject();
+    req.resources.leader = leader;
+    return Promise.resolve();
+  }).withMessage('The leader of a unit must be a member of the unit'),
 ];
