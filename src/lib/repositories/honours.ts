@@ -35,6 +35,21 @@ RETURNING id, name, description`;
   }
 }
 
+export async function delete_honour(honour: BattleHonour): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE FROM e.battle_honours
+WHERE id = ${honour.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 export function find_by_id(user: User): (id: number) => Promise<Result<Option<BattleHonour>, string>> {
   return async (id: number): Promise<Result<Option<BattleHonour>, string>> => {
     try {

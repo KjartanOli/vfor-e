@@ -80,7 +80,7 @@ CREATE TABLE e.unit_battle_honours(
        PRIMARY KEY (unit, honour, battle)
 );
 
-CREATE OR REPLACE FUNCTION delete_unit_dependencies()
+CREATE OR REPLACE FUNCTION delete_unit_dependents()
 RETURNS TRIGGER AS $$
 BEGIN
 DELETE FROM e.unit_models
@@ -95,9 +95,9 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER before_unit_delete BEFORE DELETE ON e.units
 FOR EACH ROW
-EXECUTE FUNCTION delete_unit_dependencies();
+EXECUTE FUNCTION delete_unit_dependents();
 
-CREATE OR REPLACE FUNCTION delete_model_dependencies()
+CREATE OR REPLACE FUNCTION delete_model_dependents()
 RETURNS TRIGGER AS $$
 BEGIN
 DELETE FROM e.model_wargear
@@ -115,4 +115,23 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER before_model_delete BEFORE DELETE ON e.models
 FOR EACH ROW
-EXECUTE FUNCTION delete_model_dependencies();
+EXECUTE FUNCTION delete_model_dependents();
+
+
+CREATE OR REPLACE FUNCTION delete_honour_dependents()
+RETURNS TRIGGER AS $$
+BEGIN
+DELETE FROM e.model_battle_honours
+WHERE honour = OLD.id;
+
+DELETE FROM e.unit_battle_honours
+WHERE honour = OLD.id;
+
+RETURN OLD;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER before_honour_delet BEFORE DELETE ON e.battle_honours
+FOR EACH ROW
+EXECUTE FUNCTION delete_honour_dependents();

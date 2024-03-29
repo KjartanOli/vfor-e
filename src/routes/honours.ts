@@ -57,3 +57,16 @@ export async function patch_honour(req: Request, res: Response) {
 
   res.json(result.value);
 }
+
+export async function delete_honour(req: Request, res: Response) {
+  const { honour } = req.resources;
+
+  if (!honour)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Honours.delete_honour(honour);
+  if (result.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  return res.status(204).json();
+}

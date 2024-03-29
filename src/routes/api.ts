@@ -17,7 +17,7 @@ import { existing_rank_id_validator, new_rank_validator, rank_name_validator } f
 import { delete_battle, get_battle, get_battles, patch_battle, post_battles } from './battles.js';
 import { delete_battle_validator, existing_battle_id_validator, new_battle_validator, update_battle_validator } from '../lib/validators/battles.js';
 import { existing_unit_id_validator, new_unit_validator, unit_honour_index_validator, unit_honours_validator, update_unit_validator } from '../lib/validators/units.js';
-import { get_honour, get_honours, patch_honour, post_honours } from './honours.js';
+import { delete_honour, get_honour, get_honours, patch_honour, post_honours } from './honours.js';
 import { existing_honour_id_validator, honour_name_validator, new_honour_validator, update_honour_validator } from '../lib/validators/honours.js';
 
 export const router = express.Router();
@@ -88,6 +88,13 @@ const endpoints: Array<Endpoint> = [
         authentication: [ensure_authenticated],
         validation: [existing_honour_id_validator(), ...update_honour_validator],
         handlers: [patch_honour],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.DELETE,
+        authentication: [ensure_authenticated],
+        validation: [existing_honour_id_validator()],
+        handlers: [delete_honour],
       }
     ]
   },
