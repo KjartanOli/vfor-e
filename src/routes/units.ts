@@ -83,3 +83,25 @@ export async function post_units(req: Request, res: Response) {
 
   res.json(unit.value);
 }
+
+export async function patch_unit(req: Request, res: Response) {
+   if (!req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const { name } = matchedData(req);
+  const { unit, leader } = req.resources;
+
+  if (!unit)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const updated = await Units.update_unit({
+    ...unit,
+    name: name || unit.name,
+    leader: leader || unit.leader
+  }, req.user);
+
+  if (updated.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(updated.value);
+}

@@ -105,10 +105,11 @@ function leader_validator() {
   return int_validator(body, 'leader', 1)
     .bail()
     .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
-    if (!req.resources?.members)
+      const members = req.resources?.members || req.resources?.unit?.members;
+    if (!members)
       return Promise.reject();
 
-    const leader = req.resources.members.find(m => m.id == value);
+    const leader = members.find(m => m.id == value);
     if (!leader)
       return Promise.reject();
     req.resources.leader = leader;
@@ -122,7 +123,10 @@ export const new_unit_validator = [
   unit_honours_validator(),
 ];
 
-export const update_unit_validator = new_unit_validator.map(v => v.optional());
+export const update_unit_validator = [
+  name_validator().optional(),
+  leader_validator().optional(),
+];
 
 
 export function existing_unit_id_validator() {

@@ -208,3 +208,20 @@ ${ db(honours.map(h => ({
     return Err(Errors.DATABASE);
   }
 }
+
+export async function update_unit(unit: Unit, user: User): Promise<Result<Unit, string>> {
+  try {
+    const result = await db`
+UPDATE e.units
+SET name = ${unit.name}, leader = ${unit.leader.id}
+WHERE id = ${unit.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+
+    return Ok((await find_by_id(user)(unit.id)).unwrap().unwrap());
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
