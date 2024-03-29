@@ -25,10 +25,10 @@ export function delete_battle_validator() {
       const { units, models } = await Battles.honours_for(value);
 
       if (units.length > 0)
-        Promise.reject(`Can not delete battle while units ${units} have battle honours from it`);
+        return Promise.reject(`Can not delete battle while units ${units} have battle honours from it`);
 
       if (models.length > 0)
-        Promise.reject(`Can not delete battle while models ${models} have battle honours from it`);
+        return Promise.reject(`Can not delete battle while models ${models} have battle honours from it`);
 
       return Promise.resolve();
     })

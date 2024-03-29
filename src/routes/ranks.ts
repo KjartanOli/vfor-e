@@ -53,3 +53,16 @@ export async function patch_rank(req: Request, res: Response) {
 
   res.json(result.value);
 }
+
+export async function delete_rank(req: Request, res: Response) {
+  const { rank } = req.resources;
+
+  if (!rank)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Ranks.delete_rank(rank);
+  if (result.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  return res.status(204).json();
+}

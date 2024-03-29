@@ -23,6 +23,19 @@ export function existing_rank_id_validator() {
     .withMessage('Invalid rank id');
 }
 
+export function delete_rank_validator() {
+  return int_validator(param, 'id', 1)
+    .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+      const models = await Ranks.holders_of(value);
+
+      if (models.length > 0)
+        return Promise.reject(`Can not delete rank while models ${models} hold it`);
+
+      return Promise.resolve();
+    });
+}
+
+
 export function rank_name_validator() {
     return string_validator(body, 'name', 1, 64);
 }

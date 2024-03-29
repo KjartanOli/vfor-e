@@ -12,8 +12,8 @@ import { existing_wargear_type_id_validator, new_wargear_type_validator, new_war
 import { check_validation } from '../lib/validators/validators.js';
 import { delete_model, delete_model_honour, delete_model_wargear, get_model, get_model_honours, get_model_indexed_honour, get_model_indexed_wargear, get_model_wargear, get_models, patch_model, post_model_honours, post_model_wargear, post_models } from './models.js';
 import { existing_model_id_validator, model_honour_index_validator, model_honours_validator, model_id_validator, model_not_leader_validator, model_wargear_index_validator, model_wargear_validator, new_model_validator, update_model_validator } from '../lib/validators/models.js';
-import { get_rank, get_ranks, patch_rank, post_ranks } from './ranks.js';
-import { existing_rank_id_validator, new_rank_validator, rank_name_validator } from '../lib/validators/ranks.js';
+import { delete_rank, get_rank, get_ranks, patch_rank, post_ranks } from './ranks.js';
+import { delete_rank_validator, existing_rank_id_validator, new_rank_validator, rank_name_validator } from '../lib/validators/ranks.js';
 import { delete_battle, get_battle, get_battles, patch_battle, post_battles } from './battles.js';
 import { delete_battle_validator, existing_battle_id_validator, new_battle_validator, update_battle_validator } from '../lib/validators/battles.js';
 import { existing_unit_id_validator, new_unit_validator, unit_honour_index_validator, unit_honours_validator, update_unit_validator } from '../lib/validators/units.js';
@@ -132,6 +132,13 @@ const endpoints: Array<Endpoint> = [
         authentication: [ensure_authenticated],
         validation: [existing_rank_id_validator(), rank_name_validator()],
         handlers: [patch_rank],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.DELETE,
+        authentication: [ensure_authenticated],
+        validation: [existing_rank_id_validator(), delete_rank_validator()],
+        handlers: [delete_rank],
       }
     ]
   },

@@ -54,6 +54,22 @@ RETURNING id, name`;
   }
 }
 
+export async function delete_rank(rank: Rank): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE FROM e.ranks
+WHERE id = ${rank.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
+
 export function find_by_name(user: User): (name: string) => Promise<Result<Option<Rank>, string>> {
   return async (name: string): Promise<Result<Option<Rank>, string>> => {
     try {
@@ -88,4 +104,11 @@ WHERE user_id = ${user.id} AND id = ${id}`;
     return Err(Errors.DATABASE);
   }
   }
+}
+
+export async function holders_of(id: number): Promise<number[]> {
+  return (await db<{id: number}[]>`
+SELECT id
+FROM e.models
+WHERE rank = ${id}`).map(m => m.id);
 }
