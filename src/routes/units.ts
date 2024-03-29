@@ -105,3 +105,16 @@ export async function patch_unit(req: Request, res: Response) {
 
   res.json(updated.value);
 }
+
+export async function delete_unit(req: Request, res: Response) {
+  const { unit } = req.resources;
+
+  if (!unit)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Units.delete_unit(unit);
+  if (result.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  return res.status(204).json();
+}

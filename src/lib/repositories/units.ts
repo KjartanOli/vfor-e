@@ -225,3 +225,18 @@ WHERE id = ${unit.id}`;
     return Err(Errors.DATABASE);
   }
 }
+
+export async function delete_unit(unit: Unit): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE FROM e.units
+WHERE id = ${unit.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}

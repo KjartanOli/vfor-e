@@ -5,7 +5,7 @@ import { Endpoint, Method, MethodDescriptor, User, default_method_descriptor } f
 import { jwt_secret, token_lifetime } from '../app.js';
 import * as Users from '../lib/repositories/users.js';
 import { Errors } from '../lib/errors.js';
-import { delete_unit_honour, get_unit, get_unit_honours, get_unit_indexed_honour, get_units, patch_unit, post_unit_honours, post_units } from './units.js';
+import { delete_unit, delete_unit_honour, get_unit, get_unit_honours, get_unit_indexed_honour, get_units, patch_unit, post_unit_honours, post_units } from './units.js';
 import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, post_wargear, post_wargear_types } from './wargear.js';
 import { ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
 import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
@@ -206,6 +206,13 @@ const endpoints: Array<Endpoint> = [
         authentication: [ensure_authenticated],
         validation: [existing_unit_id_validator(), ...update_unit_validator],
         handlers: [patch_unit],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.DELETE,
+        authentication: [ensure_authenticated],
+        validation: [existing_unit_id_validator()],
+        handlers: [delete_unit],
       }
     ]
   },
