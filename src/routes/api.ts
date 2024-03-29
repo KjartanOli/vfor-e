@@ -10,7 +10,7 @@ import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, p
 import { admin_authenticator, ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
 import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
 import { check_validation } from '../lib/validators/validators.js';
-import { get_model, get_models, post_models } from './models.js';
+import { get_model, get_model_wargear, get_models, post_models } from './models.js';
 import { existing_model_id_validator, model_id_validator, new_model_validator } from '../lib/validators/models.js';
 import { get_rank, get_ranks, patch_rank, post_ranks } from './ranks.js';
 import { existing_rank_id_validator, new_rank_validator, rank_name_validator } from '../lib/validators/ranks.js';
@@ -210,6 +210,18 @@ const endpoints: Array<Endpoint> = [
         authentication: [ensure_authenticated],
         validation: [existing_model_id_validator()],
         handlers: [get_model],
+      }
+    ]
+  },
+  {
+    href: '/models/:id/wargear',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_model_id_validator()],
+        handlers: [get_model_wargear],
       }
     ]
   },
