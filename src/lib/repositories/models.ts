@@ -101,6 +101,21 @@ ${ db(model.honours.map(h => ({
   }
 }
 
+export async function delete_model(model: Model): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE FROM e.models
+WHERE id = ${model.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 export async function add_wargear(model: Model, wargear: Wargear[], user: User): Promise<Result<Model, string>> {
   try {
     const result = await db`
@@ -113,6 +128,20 @@ INSERT INTO e.model_wargear ${ db(wargear.map(w => (
       return Err(Errors.DATABASE);
 
     return Ok((await find_by_id(user)(model.id)).unwrap().unwrap());
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
+export async function leads(model: Model): Promise<Result<number[], string>> {
+  try {
+    const units = await db<{id: number}[]>`
+SELECT id
+FROM e.units
+WHERE leader = ${model.id}`;
+
+    return Ok(units.map(u => u.id));
   } catch (e) {
     console.log(e);
     return Err(Errors.DATABASE);

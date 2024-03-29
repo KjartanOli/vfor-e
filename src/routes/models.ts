@@ -40,6 +40,19 @@ export async function get_model(req: Request, res: Response) {
   res.json(model);
 }
 
+export async function delete_model(req: Request, res: Response) {
+  const { model } = req.resources;
+
+  if (!model)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Models.delete_model(model);
+  if (result.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  return res.status(204).json();
+}
+
 export async function get_model_wargear(req: Request, res: Response) {
   const { model } = req.resources;
 

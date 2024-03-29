@@ -71,6 +71,20 @@ export function model_honour_index_validator() {
     })
 }
 
+export function model_not_leader_validator() {
+  return int_validator(param, 'id', 1)
+    .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+      if (!req.resources.model)
+        return Promise.reject(Errors.INTERNAL);
+      const leads = await Models.leads(req.resources.model)
+      if (leads.isErr())
+        return Promise.reject(Errors.INTERNAL);
+      if (leads.value.length > 0)
+        return Promise.reject('Can not delete a model while it is the leader of units: ${leads.value}');
+      return Promise.resolve();
+    });
+}
+
 export function model_honours_validator() {
   return body('honours')
     .isArray()
