@@ -19,11 +19,6 @@ CREATE TABLE e.battles(
        description TEXT
 );
 
-CREATE TABLE e.factions(
-       id SERIAL PRIMARY KEY,
-       name VARCHAR(64)
-);
-
 CREATE TABLE e.battle_honours(
        id SERIAL PRIMARY KEY,
        user_id INTEGER REFERENCES e.users(id),
@@ -85,19 +80,39 @@ CREATE TABLE e.unit_battle_honours(
        PRIMARY KEY (unit, honour, battle)
 );
 
-CREATE TABLE e.armies(
-       id SERIAL PRIMARY KEY,
-       player VARCHAR(64),
-       commander INTEGER REFERENCES e.units(id)
-);
+CREATE OR REPLACE FUNCTION delete_unit_dependencies()
+RETURNS TRIGGER AS $$
+BEGIN
+DELETE FROM e.unit_models
+WHERE unit = OLD.id;
 
-CREATE TABLE e.army_units(
-       army INTEGER REFERENCES e.armies(id),
-       unit INTEGER REFERENCES e.units(id),
-       PRIMARY KEY (army, unit)
-);
+DELETE FROM e.unit_battle_honours
+WHERE unit = OLD.id;
+RETURN OLD;
+END;
+$$
+LANGUAGE plpgsql;
 
-CREATE TABLE e.faction_armies(
-       faction INTEGER REFERENCES e.factions(id),
-       army INTEGER REFERENCES e.armies(id)
-);
+CREATE OR REPLACE TRIGGER before_unit_delete BEFORE DELETE ON e.units
+FOR EACH ROW
+EXECUTE FUNCTION delete_unit_dependencies();
+
+CREATE OR REPLACE FUNCTION delete_model_dependencies()
+RETURNS TRIGGER AS $$
+BEGIN
+DELETE FROM e.model_wargear
+WHERE model = OLD.id;
+
+DELETE FROM e.unit_models
+WHERE model = OLD.id;
+
+DELETE FROM e.model_battle_honours
+WHERE model = OLD.id;
+RETURN OLD;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER before_model_delete BEFORE DELETE ON e.models
+FOR EACH ROW
+EXECUTE FUNCTION delete_model_dependencies();
