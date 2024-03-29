@@ -44,29 +44,29 @@ export function model_wargear_validator() {
 }
 
 export function model_wargear_index_validator() {
-  return int_validator(param, 'index', 0)
+  return int_validator(param, 'index', 1)
     .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
       const wargear = req.resources?.model?.wargear;
       if (!wargear)
         return Promise.reject(Errors.INTERNAL)
       if (wargear.length < value)
-        return Promise.reject(`index must be between 0 and ${wargear.length}`);
+        return Promise.reject(`index must be between 1 and ${wargear.length}`);
 
-      req.resources.index = value;
+      req.resources.index = value - 1;
       return Promise.resolve();
     })
 }
 
 export function model_honour_index_validator() {
-  return int_validator(param, 'index', 0)
+  return int_validator(param, 'index', 1)
     .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
       const honours = req.resources?.model?.honours;
       if (!honours)
         return Promise.reject(Errors.INTERNAL)
       if (honours.length < value)
-        return Promise.reject(`index must be between 0 and ${honours.length}`);
+        return Promise.reject(`index must be between 1 and ${honours.length}`);
 
-      req.resources.index = value;
+      req.resources.index = value - 1;
       return Promise.resolve();
     })
 }
