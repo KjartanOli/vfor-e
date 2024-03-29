@@ -31,7 +31,9 @@ export function model_wargear_validator() {
       if (!req.resources)
         req.resources = {};
 
-      const wargear = Result.all<Result<Option<Wargear>, string>[]>(...await Promise.all(value.map(W.find_by_id)))
+      if (!req.user)
+        return Promise.reject();
+      const wargear = Result.all<Result<Option<Wargear>, string>[]>(...await Promise.all(value.map(W.find_by_id(req.user))))
       if (wargear.isErr())
         return Promise.reject();
 
@@ -55,9 +57,30 @@ export function model_wargear_index_validator() {
     })
 }
 
+export function model_honour_index_validator() {
+  return int_validator(param, 'index', 0)
+    .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+      const honours = req.resources?.model?.honours;
+      if (!honours)
+        return Promise.reject(Errors.INTERNAL)
+      if (honours.length < value)
+        return Promise.reject(`index must be between 0 and ${honours.length}`);
+
+      req.resources.index = value;
+      return Promise.resolve();
+    })
+}
+
 export function model_honours_validator() {
   return body('honours')
     .isArray()
+    .bail()
+    .custom(value => value.every((h: {
+      honour?: number,
+      battle?: number,
+      reason?: string
+    }) => (h.honour && h.battle && h.reason)))
+    .withMessage('Each honour most consist of: A honour id, a battle id, and a reason')
     .bail()
     .custom(async (value: {honour: number, battle: number, reason: string}[], {req, location, path}) => {
       if (!req.resources)
