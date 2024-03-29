@@ -5,7 +5,7 @@ import { Endpoint, Method, MethodDescriptor, User, default_method_descriptor } f
 import { jwt_secret, token_lifetime } from '../app.js';
 import * as Users from '../lib/repositories/users.js';
 import { Errors } from '../lib/errors.js';
-import { get_units, post_units } from './units.js';
+import { delete_unit_honour, get_unit, get_unit_honours, get_unit_indexed_honour, get_units, post_unit_honours, post_units } from './units.js';
 import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, post_wargear, post_wargear_types } from './wargear.js';
 import { ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
 import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
@@ -16,7 +16,7 @@ import { get_rank, get_ranks, patch_rank, post_ranks } from './ranks.js';
 import { existing_rank_id_validator, new_rank_validator, rank_name_validator } from '../lib/validators/ranks.js';
 import { get_battle, get_battles, patch_battle, post_battles } from './battles.js';
 import { existing_battle_id_validator, new_battle_validator, update_battle_validator } from '../lib/validators/battles.js';
-import { new_unit_validator } from '../lib/validators/units.js';
+import { existing_unit_id_validator, new_unit_validator, unit_honour_index_validator, unit_honours_validator } from '../lib/validators/units.js';
 import { get_honour, get_honours, patch_honour, post_honours } from './honours.js';
 import { existing_honour_id_validator, honour_name_validator, new_honour_validator, update_honour_validator } from '../lib/validators/honours.js';
 
@@ -182,6 +182,56 @@ const endpoints: Array<Endpoint> = [
         handlers: [post_units]
       }
     ],
+  },
+  {
+    href: '/units/:id',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_unit_id_validator()],
+        handlers: [get_unit],
+      }
+    ]
+  },
+  {
+    href: '/units/:id/honours',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_unit_id_validator()],
+        handlers: [get_unit_honours],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.POST,
+        authentication: [ensure_authenticated],
+        validation: [existing_unit_id_validator(), unit_honours_validator()],
+        handlers: [post_unit_honours],
+      },
+    ]
+  },
+  {
+    href: '/units/:id/honours/:index',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_unit_id_validator(), unit_honour_index_validator()],
+        handlers: [get_unit_indexed_honour],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.DELETE,
+        authentication: [ensure_authenticated],
+        validation: [existing_unit_id_validator(), unit_honour_index_validator()],
+        handlers: [delete_unit_honour],
+      },
+    ]
   },
   {
     href: '/models',
