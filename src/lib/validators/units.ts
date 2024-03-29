@@ -29,10 +29,11 @@ function member_validator() {
       req.resources.members = models.value.map(m => m.unwrap());
     });
 }
-export const new_unit_validator = [
-  name_validator(),
-  member_validator(),
-  int_validator(body, 'leader', 1).bail().custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
+
+function leader_validator() {
+  return int_validator(body, 'leader', 1)
+    .bail()
+    .custom(async (value: number, {req, location, path}: {req: Request, location: any, path: any}) => {
     if (!req.resources?.members)
       return Promise.reject();
 
@@ -41,5 +42,12 @@ export const new_unit_validator = [
       return Promise.reject();
     req.resources.leader = leader;
     return Promise.resolve();
-  }).withMessage('The leader of a unit must be a member of the unit'),
+  }).withMessage('The leader of a unit must be a member of the unit')
+}
+export const new_unit_validator = [
+  name_validator(),
+  member_validator(),
+  leader_validator(),
 ];
+
+export const update_unit_validator = new_unit_validator.map(v => v.optional());

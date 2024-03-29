@@ -16,7 +16,7 @@ WHERE user_id = ${user.id}`;
       return Err(Errors.DATABASE);
 
     const units = await Promise.all(results.map(async (unit): Promise<Unit> => {
-      const models = await get_models(unit.id);
+      const models = await get_models(unit.id, user);
       if (models.isErr())
         throw new Error(Errors.DATABASE);
       const leader = models.value.find(model => model.id === unit.leader_id);
@@ -83,7 +83,7 @@ ${ db(unit.honours.map(h => ({
   }
 }
 
-async function get_models(id: number): Promise<Result<Model[], string>> {
+async function get_models(id: number, user: User): Promise<Result<Model[], string>> {
   try {
     const models = await db<Omit<Model, 'wargear'>[]>`
 SELECT m.id, m.name, r.name
@@ -94,7 +94,7 @@ WHERE m.id = ${id}`;
     return Ok(await Promise.all(models.map(async model => ({
       ...model,
       wargear: await Models.get_wargear(model.id),
-      honours: await Models.get_honours(model.id)
+      honours: await Models.get_honours(model.id, user)
     }))));
 
   } catch (e) {
@@ -113,7 +113,7 @@ WHERE unit = ${id}`;
       return Err(Errors.DATABASE);
 
     return Ok(await Promise.all(honours.map(async (h): Promise<Award> => {
-      const honour = await Honours.find_by_id(h.honour_id);
+      const honour = await Honours.find_by_id(user)(h.honour_id);
       if (honour.isErr() || honour.value.isNone())
         throw new Error(Errors.DATABASE);
 

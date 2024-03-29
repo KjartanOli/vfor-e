@@ -103,9 +103,12 @@ declare global {
         user?: User,
         type?: WargearType,
         rank?: Rank,
+        honour?: BattleHonour,
         battle?: Battle,
         members?: Model[],
         leader?: Model,
+        wargear?: Wargear[],
+        honours?: Award[],
       }
     }
   }

@@ -17,6 +17,8 @@ import { existing_rank_id_validator, new_rank_validator, rank_name_validator } f
 import { get_battle, get_battles, patch_battle, post_battles } from './battles.js';
 import { existing_battle_id_validator, new_battle_validator, update_battle_validator } from '../lib/validators/battles.js';
 import { new_unit_validator } from '../lib/validators/units.js';
+import { get_honour, get_honours, patch_honour, post_honours } from './honours.js';
+import { existing_honour_id_validator, honour_name_validator, new_honour_validator, update_honour_validator } from '../lib/validators/honours.js';
 
 export const router = express.Router();
 
@@ -49,6 +51,43 @@ const endpoints: Array<Endpoint> = [
         method: Method.POST,
         validation: [...new_user_validator],
         handlers: [post_register, post_login]
+      }
+    ]
+  },
+  {
+    href: '/honours',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        handlers: [get_honours]
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.POST,
+        authentication: [ensure_authenticated],
+        validation: [...new_honour_validator],
+        handlers: [post_honours]
+      }
+    ]
+  },
+  {
+    href: '/honours/:id',
+    methods: [
+      {
+        ...default_method_descriptor,
+        method: Method.GET,
+        authentication: [ensure_authenticated],
+        validation: [existing_honour_id_validator()],
+        handlers: [get_honour],
+      },
+      {
+        ...default_method_descriptor,
+        method: Method.PATCH,
+        authentication: [ensure_authenticated],
+        validation: [existing_honour_id_validator(), ...update_honour_validator],
+        handlers: [patch_honour],
       }
     ]
   },

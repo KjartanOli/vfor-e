@@ -14,14 +14,14 @@ export async function get_models(req: Request, res: Response) {
 }
 
 export async function post_models(req: Request, res: Response) {
-  const { name, wargear = [], honours = [] } = matchedData(req);
+  const { name } = matchedData(req);
   const user = req.user;
 
   if (!user)
     return res.status(500).json({ error: Errors.INTERNAL });
 
-  const { rank } = req.resources;
-  if (!rank)
+  const { rank, wargear, honours } = req.resources;
+  if (!rank || !wargear || !honours)
     return res.status(500).json({ error: Errors.INTERNAL });
 
   const model = await Models.add_model({name, rank, wargear, honours}, user);

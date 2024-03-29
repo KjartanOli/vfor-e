@@ -27,6 +27,7 @@ CREATE TABLE e.factions(
 
 CREATE TABLE e.battle_honours(
        id SERIAL PRIMARY KEY,
+       user_id INTEGER REFERENCES e.users(id),
        name VARCHAR(64) UNIQUE,
        description VARCHAR(1024)
 );
@@ -38,6 +39,7 @@ CREATE TABLE e.wargear_types(
 
 CREATE TABLE e.wargear(
        id SERIAL PRIMARY KEY,
+       user_id INTEGER REFERENCES e.users(id),
        name VARCHAR(30),
        type INTEGER REFERENCES e.wargear_types(id)
 );

@@ -3,6 +3,8 @@ import { db } from '../../app.js';
 import { Errors } from '../errors.js';
 import { Award, Model, User, Wargear } from '../types';
 import * as Ranks from './ranks.js';
+import * as Honours from './honours.js';
+import * as Battles from './battles.js';
 
 interface ModelSkeleton {
   id: number;
@@ -12,11 +14,11 @@ interface ModelSkeleton {
 
 function inflate(user: User): (skel: ModelSkeleton) => Promise<Model> {
   return async (skel: ModelSkeleton) => ({
-      id: skel.id,
-      name: skel.name,
-      rank: (await Ranks.find_by_id(user)(skel.rank_id)).unwrap().unwrap(),
-      wargear: await get_wargear(skel.id),
-      honours: await get_honours(skel.id),
+    id: skel.id,
+    name: skel.name,
+    rank: (await Ranks.find_by_id(user)(skel.rank_id)).unwrap().unwrap(),
+    wargear: await get_wargear(skel.id),
+    honours: await get_honours(skel.id, user),
   });
 }
 
@@ -41,20 +43,20 @@ WHERE m.user_id = ${user.id}`;
 export function find_by_id(user: User): (id: number) => Promise<Result<Option<Model>, string>> {
   return async (id: number): Promise<Result<Option<Model>, string>> => {
     try {
-    const [skel] = await db<[ModelSkeleton?]>`
+      const [skel] = await db<[ModelSkeleton?]>`
 SELECT id, rank as rank_id, name
 FROM e.models
 WHERE id = ${id} AND user_id = ${user.id}`;
 
-    if (!skel)
-      return Ok(None);
+      if (!skel)
+        return Ok(None);
 
-    return Ok(Some(await inflate(user)(skel)));
-  } catch (e) {
-    console.log(e);
-    return Err(Errors.DATABASE);
+      return Ok(Some(await inflate(user)(skel)));
+    } catch (e) {
+      console.log(e);
+      return Err(Errors.DATABASE);
+    }
   }
-}
 }
 
 export async function add_model(model: Omit<Model, 'id'>, user: User): Promise<Result<Model, string>> {
@@ -77,9 +79,9 @@ VALUES (${ db(model.wargear.map(w => ({ model: result, wargear: w.id })), 'model
     }
     if (model.honours.length > 0) {
       const honours = await db`
-INSERT INTO e.model_battle_honours(model, honour, battle, reason)
-VALUES ${ db(model.honours.map(h => ({
-  model: result,
+INSERT INTO e.model_battle_honours
+${ db(model.honours.map(h => ({
+  model: result.id,
   honour: h.honour.id,
   battle: h.battle.id,
   reason: h.reason
@@ -112,6 +114,28 @@ WHERE m.model = ${id}`).map(w => ({
 }));
 }
 
-export async function get_honours(id: number): Promise<Award[]> {
-  return [];
+export async function get_honours(id: number, user: User): Promise<Award[]> {
+  const honours = await db<{honour_id: number, battle_id: number, reason: string}[]>`
+SELECT honour as honour_id, battle as battle_id, reason
+FROM e.model_battle_honours
+WHERE model = ${id}`;
+
+  if (!honours)
+    throw new Error(Errors.DATABASE);
+
+  return Promise.all(honours.map(async (h): Promise<Award> => {
+    const honour = await Honours.find_by_id(user)(h.honour_id);
+    if (honour.isErr() || honour.value.isNone())
+      throw new Error(Errors.DATABASE);
+
+    const battle = await Battles.find_by_id(user)(h.battle_id);
+    if (battle.isErr() || battle.value.isNone())
+      throw new Error(Errors.DATABASE);
+
+    return {
+      honour: honour.value.value,
+      battle: battle.value.value,
+      reason: h.reason
+    };
+  }));
 }

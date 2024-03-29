@@ -3,6 +3,7 @@ import { db } from '../../app.js';
 import { Wargear, WargearType } from '../types.js';
 import { Errors } from '../errors.js';
 
+// TODO: Make wargear user specific
 export async function get_wargear(): Promise<Result<Wargear[], string>> {
   try {
     const wargear = await db<Wargear[]>`
@@ -20,10 +21,36 @@ INNER JOIN e.wargear_types t ON w.type = t.id`;
   }
 }
 
+export async function find_by_id(id: number): Promise<Result<Option<Wargear>, string>> {
+  try {
+    const [wargear]: [{id: number, name: string, type_id: number, type: string}?] = await db`
+SELECT w.id as id, w.name as name, t.name as type, t.id as type_id
+FROM e.wargear w
+INNER JOIN e.wargear_types t ON w.type = t.id
+WHERE w.id = ${id}`;
+
+    if (!wargear)
+      return Ok(None);
+
+    return Ok(Some({
+      id: wargear.id,
+      name: wargear.name,
+      type: {
+        id: wargear.type_id,
+        name: wargear.type
+      }
+    }));
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
+
 export async function find_by_name(name: string): Promise<Result<Option<Wargear>, string>> {
   try {
-    const [wargear]: [Wargear?] = await db`
-SELECT w.id, w.name, t.name
+    const [wargear]: [{id: number, name: string, type_id: number, type: string}?] = await db`
+SELECT w.id as id, w.name as name, t.name as type, t.id as type_id
 FROM e.wargear w
 INNER JOIN e.wargear_types t ON w.type = t.id
 WHERE w.name = ${name}`;
@@ -31,7 +58,14 @@ WHERE w.name = ${name}`;
     if (!wargear)
       return Ok(None);
 
-    return Ok(Some(wargear));
+    return Ok(Some({
+      id: wargear.id,
+      name: wargear.name,
+      type: {
+        id: wargear.type_id,
+        name: wargear.type
+      }
+    }));
   } catch (e) {
     console.log(e);
     return Err(Errors.DATABASE);
