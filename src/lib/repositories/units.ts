@@ -74,9 +74,8 @@ WHERE id = ${id} AND user_id = ${user.id}`;
   }
 }
 
-export async function add_unit(unit: Omit<Unit, 'id'>, user: User): Promise<Result<Unit, string>> {
+export async function add_unit(unit: Omit<Unit, 'id'>, honours: Award[], user: User): Promise<Result<Unit, string>> {
   try {
-    console.log(unit, user);
     const [res] = await db<[{id: number}?]>`
 INSERT INTO e.units(name, leader, user_id)
 VALUES (${unit.name}, ${unit.leader.id}, ${user.id})
@@ -96,17 +95,18 @@ ${ db(unit.members.map(m => ({
     if (unit.honours.length > 0)
       if (!await db`
 INSERT INTO e.unit_battle_honours
-${ db(unit.honours.map(h => ({
+${ db(honours.map(h => ({
   unit: res.id,
   honour: h.honour.id,
   battle: h.battle.id,
   reason: h.reason
-})), 'unit', 'honour', 'battle', 'reason')}`)
+})))}`)
         return Err(Errors.DATABASE);
 
     return Ok({
       id: res.id,
-      ...unit
+      ...unit,
+      honours: (await get_honours(res.id, user)).unwrap()
     });
   } catch (e) {
     console.log(e);
