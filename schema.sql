@@ -1,8 +1,7 @@
 CREATE TABLE e.users(
   id SERIAL PRIMARY KEY,
   username VARCHAR(30) NOT NULL UNIQUE,
-  password CHAR(97) NOT NULL,
-  admin BOOLEAN DEFAULT false
+  password CHAR(97) NOT NULL
 );
 
 CREATE TABLE e.ranks(
@@ -34,7 +33,8 @@ CREATE TABLE e.battle_honours(
 
 CREATE TABLE e.wargear_types(
        id SERIAL PRIMARY KEY,
-       name VARCHAR(20) UNIQUE
+       name VARCHAR(20) UNIQUE,
+       user_id INTEGER REFERENCES e.users(id)
 );
 
 CREATE TABLE e.wargear(

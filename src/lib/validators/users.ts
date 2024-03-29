@@ -36,15 +36,3 @@ export async function ensure_authenticated(req: Request, res: Response, next: Ne
       return next();
     })(req, res, next);
 }
-
-async function ensure_admin(req: Request, res: Response, next: NextFunction) {
-  if (!req.user?.admin)
-    return res.status(401).json({ error: 'Insufficient permissions' });
-
-  next();
-}
-
-export const admin_authenticator = [
-  ensure_authenticated,
-  ensure_admin,
-];

@@ -5,7 +5,10 @@ import { Errors } from "../lib/errors.js";
 import { matchedData } from "express-validator";
 
 export async function get_wargear(req: Request, res: Response) {
-  const wargear = await Wargear.get_wargear();
+  if (!req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const wargear = await Wargear.get_wargear(req.user);
   if (wargear.isErr())
     return res.status(500).json({ error: Errors.INTERNAL });
   res.json(wargear.value);
@@ -16,10 +19,10 @@ export async function post_wargear(req: Request, res: Response) {
 
   const { type } = req.resources;
 
-  if (!type)
+  if (!type || !req.user)
     return res.status(500).json({ error: Errors.INTERNAL });
 
-  const result = await Wargear.add(name, type);
+  const result = await Wargear.add(name, type, req.user);
 
   if (result.isErr())
     return res.status(500).json({ error: Errors.INTERNAL });
@@ -28,7 +31,10 @@ export async function post_wargear(req: Request, res: Response) {
 }
 
 export async function get_wargear_types(req: Request, res: Response) {
-  const types = await Wargear.get_types();
+  if (!req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const types = await Wargear.get_types(req.user);
   if (types.isErr())
     return res.status(500).json({ error: Errors.INTERNAL });
   res.json(types.value);
@@ -37,7 +43,10 @@ export async function get_wargear_types(req: Request, res: Response) {
 export async function post_wargear_types(req: Request, res: Response) {
   const { name } = matchedData(req);
 
-  const result = await Wargear.add_type(name);
+  if (!req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const result = await Wargear.add_type(name, req.user);
 
   if (result.isErr())
     return res.status(500).json({ error: Errors.INTERNAL });
@@ -58,10 +67,10 @@ export async function patch_wargear_type(req: Request, res: Response) {
   const { name } = matchedData(req);
   const { type } = req.resources;
 
-  if (!type)
+  if (!type || !req.user)
     return res.status(500).json({ error: Errors.INTERNAL });
 
-  const result = await Wargear.update_type({...type, name});
+  const result = await Wargear.update_type({...type, name}, req.user);
 
   if (result.isErr())
     return res.status(500).json({ error: Errors.INTERNAL });

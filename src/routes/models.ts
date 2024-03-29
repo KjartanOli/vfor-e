@@ -21,7 +21,7 @@ export async function post_models(req: Request, res: Response) {
     return res.status(500).json({ error: Errors.INTERNAL });
 
   const { rank, wargear, honours } = req.resources;
-  if (!rank || !wargear || !honours)
+  if (!rank || !wargear || !honours || !Array.isArray(wargear))
     return res.status(500).json({ error: Errors.INTERNAL });
 
   const model = await Models.add_model({name, rank, wargear, honours}, user);
@@ -83,7 +83,7 @@ export async function get_model_honours(req: Request, res: Response) {
 export async function post_model_wargear(req: Request, res: Response) {
   const { model, wargear } = req.resources;
 
-  if (!model || !wargear || !req.user)
+  if (!model || !wargear || !req.user || !Array.isArray(wargear))
     return res.status(500).json({ error: Errors.INTERNAL });
 
   const updated = await Models.add_wargear(model, wargear, req.user);

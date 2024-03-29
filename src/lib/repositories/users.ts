@@ -10,7 +10,7 @@ const argon = new Argon2id();
 export async function find_by_id(id: number): Promise<Result<Option<User>, string>> {
   try {
     const [user]: [User?] = await db`
-SELECT id, username, password, admin
+SELECT id, username, password
 FROM e.users
 WHERE id = ${id};
 `
@@ -48,7 +48,7 @@ export async function compare_passwords(
   return argon.verify(user.password, password)
 }
 
-export async function create(user: Omit<Omit<User, 'id'>, 'admin'>): Promise<Result<User, string>> {
+export async function create(user: Omit<User, 'id'>): Promise<Result<User, string>> {
   const hash = await argon.hash(user.password);
 
   try {

@@ -4,7 +4,6 @@ export interface User {
   id: number,
   username: string,
   password: string,
-  admin: boolean,
 };
 
 export interface WargearType {
@@ -96,7 +95,6 @@ declare global {
       id: number,
       username: string,
       password: string,
-      admin: boolean,
     }
     export interface Request {
       resources: {
@@ -108,7 +106,7 @@ declare global {
         model?: Model,
         members?: Model[],
         leader?: Model,
-        wargear?: Wargear[],
+        wargear?: Wargear | Wargear[],
         honours?: Award[],
         index?: number,
       }

@@ -7,7 +7,7 @@ import * as Users from '../lib/repositories/users.js';
 import { Errors } from '../lib/errors.js';
 import { get_units, post_units } from './units.js';
 import { get_wargear, get_wargear_type, get_wargear_types, patch_wargear_type, post_wargear, post_wargear_types } from './wargear.js';
-import { admin_authenticator, ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
+import { ensure_authenticated, existing_user_validator, new_user_validator } from '../lib/validators/users.js';
 import { existing_wargear_type_id_validator, new_wargear_type_validator, new_wargear_validator, wargear_type_name_validator } from '../lib/validators/wargear.js';
 import { check_validation } from '../lib/validators/validators.js';
 import { delete_model_wargear, get_model, get_model_honours, get_model_indexed_wargear, get_model_wargear, get_models, post_model_honours, post_model_wargear, post_models } from './models.js';
@@ -276,12 +276,13 @@ const endpoints: Array<Endpoint> = [
       {
         ...default_method_descriptor,
         method: Method.GET,
+        authentication: [ensure_authenticated],
         handlers: [get_wargear]
       },
       {
         ...default_method_descriptor,
         method: Method.POST,
-        authentication: [...admin_authenticator],
+        authentication: [ensure_authenticated],
         validation: [...new_wargear_validator],
         handlers: [post_wargear]
       },
@@ -293,12 +294,13 @@ const endpoints: Array<Endpoint> = [
       {
         ...default_method_descriptor,
         method: Method.GET,
+        authentication: [ensure_authenticated],
         handlers: [get_wargear_types]
       },
       {
         ...default_method_descriptor,
         method: Method.POST,
-        authentication: [...admin_authenticator],
+        authentication: [ensure_authenticated],
         validation: [...new_wargear_type_validator],
         handlers: [post_wargear_types]
       },
@@ -310,13 +312,14 @@ const endpoints: Array<Endpoint> = [
       {
         ...default_method_descriptor,
         method: Method.GET,
+        authentication: [ensure_authenticated],
         validation: [existing_wargear_type_id_validator()],
         handlers: [get_wargear_type]
       },
       {
         ...default_method_descriptor,
         method: Method.PATCH,
-        authentication: [...admin_authenticator],
+        authentication: [ensure_authenticated],
         validation: [existing_wargear_type_id_validator(), wargear_type_name_validator()],
         handlers: [patch_wargear_type]
       }
