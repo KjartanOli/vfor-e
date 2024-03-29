@@ -53,6 +53,29 @@ export async function delete_model(req: Request, res: Response) {
   return res.status(204).json();
 }
 
+export async function patch_model(req: Request, res: Response) {
+   if (!req.user)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const { name } = matchedData(req);
+  const { model, rank } = req.resources;
+
+  if (!model)
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  const updated = await Models.update_model({
+    ...model,
+    name: name || model.name,
+    rank: rank || model.rank,
+  }, req.user);
+
+  if (updated.isErr())
+    return res.status(500).json({ error: Errors.INTERNAL });
+
+  res.json(updated.value);
+}
+
+
 export async function get_model_wargear(req: Request, res: Response) {
   const { model } = req.resources;
 

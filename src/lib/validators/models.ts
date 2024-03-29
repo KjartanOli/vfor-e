@@ -131,6 +131,13 @@ export const new_model_validator = [
   model_honours_validator(),
 ];
 
+export const update_model_validator = [
+  string_validator(body, 'name', 1).optional(),
+  int_validator(body, 'rank', 1)
+    .custom(rank_id_check)
+    .optional(),
+]
+
 export function existing_model_id_validator() {
   return int_validator(param, 'id', 1)
     .bail()

@@ -116,6 +116,21 @@ WHERE id = ${model.id}`;
   }
 }
 
+export async function update_model(model: Model, user: User): Promise<Result<Model, string>> {
+  try {
+    const result = await db`
+UPDATE e.models
+SET name = ${model.name}, rank = ${model.rank.id}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok((await find_by_id(user)(model.id)).unwrap().unwrap());
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 export async function add_wargear(model: Model, wargear: Wargear[], user: User): Promise<Result<Model, string>> {
   try {
     const result = await db`
