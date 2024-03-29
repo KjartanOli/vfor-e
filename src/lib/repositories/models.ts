@@ -139,6 +139,25 @@ WHERE id IN
   }
 }
 
+export async function remove_honour(model: Model, honour: Award): Promise<Result<null, string>> {
+  try {
+    const result = await db`
+DELETE from e.model_battle_honours
+WHERE
+  model = ${model.id}
+AND honour = ${honour.honour.id}
+AND battle = ${honour.battle.id}
+AND reason = ${honour.reason}`;
+
+    if (!result)
+      return Err(Errors.DATABASE);
+    return Ok(null);
+  } catch (e) {
+    console.log(e);
+    return Err(Errors.DATABASE);
+  }
+}
+
 export async function add_honours(model: Model, honours: Award[], user: User): Promise<Result<Model, string>> {
   try {
     const result = await db`
